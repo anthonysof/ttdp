@@ -5,14 +5,16 @@
 using namespace std;
 
 class POI {
-
-public:
+private:
 	int id;
 	double x, y;
 	int d;
 	int s;
 	int open[6];
 	int close[6];
+
+public:
+	
 
 	 void POIinitilize(int vn,double xcoord,double ycoord,int dur,int score, int opent[], int closet[]){
 		this->id = vn;
@@ -25,6 +27,37 @@ public:
 			this->close[i] = closet[i];
 		}
 	}
+	double getCoordinates(char d){
+		if(d == 'x'){
+			return this->x;
+		}
+		else{
+			return this->y;
+		}
+	}
+	int getDuration() {
+		return this->d;
+	}
+	int getScore() {
+		return this->s;
+	}
+	int getOpenTime(int day){
+		for(int j=0;j<6;j++){
+			if(day==j){
+				return this->open[j];
+			}
+		}
+	}
+	int getCloseTime(int day){
+		for(int j=0;j<6;j++){
+			if(day==j){
+				return this->close[j];
+			}
+		}
+	}
+
+
+
 	POI() { }
 	//hotel constructor
 	 POI(int vn,double xcoord,double ycoord, int opent, int closet){
@@ -45,7 +78,7 @@ struct node {
 	node *next;
 };
 
-class LinkedList {
+/*class LinkedList {
 private:
 	node *head, *tail;
 public:
@@ -71,11 +104,15 @@ public:
 	pre->next = temp;
 	temp->next = cur;
 }
-} 
+}  */
 
 double calculateDistance(POI start, POI end){
 	double distance;
-	distance = pow((end.x-start.x),2)+pow((end.y - start.y),2);
+	double endx = end.getCoordinates('x');
+	double endy = end.getCoordinates('y');
+	double startx = start.getCoordinates('x');
+	double starty = start.getCoordinates('y');
+	distance = pow((endx-startx),2)+pow((endy - starty),2);
 	return sqrt(distance);
 }
 
@@ -87,24 +124,16 @@ int compare_ofs(double of1, double of2){
 
 
 double calculateOf(POI start, POI end, POI between){
-	of = pow(between.s,2)/(calculateDistance(start,between)+between.d+calculateDistance(between,end)-calculateDistance(start,end));
+	double of = pow(between.getScore(),2)/(calculateDistance(start,between)+between.getDuration()+calculateDistance(between,end)-calculateDistance(start,end));
 	return of;
 }
 
 
 int main() {
 	ifstream inFile;
-	int K;
-	int M;
-	int SD;
-	int N;
-	int id;
-	double x;
-	double y;
-	int d;
-	int s;
-	int open;
-	int close;
+	int K, M, SD, N, id;
+	double x, y;
+	int d, s, open, close;
 	int opena[7];
 	int closea[7];
 	string NWLN = "\n";
@@ -145,12 +174,11 @@ int main() {
 	cout << y << endl;
 	cout << open << endl;
 	cout << close << endl;
-	cout << hotel->close[0]<<endl;
-	cout << hotel->open[0]<<endl;
 	cout << "A POI RE!!!"<<endl;
-	cout << pois[3].x<<endl;
-	cout << pois[3].y<<endl;
-	cout << pois[1].s<<endl;
+	cout << pois[3].getCoordinates('x')<<" "<<pois[3].getCoordinates('y')<<endl;
+	cout << pois[3].getDuration()<<endl;
+	cout << pois[3].getScore()<<endl;
+	cout << calculateOf(pois[3],pois[1],pois[2])<<endl;
 	cout << calculateDistance(*hotel,pois[2])<<endl;
 
 
