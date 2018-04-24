@@ -147,7 +147,7 @@ void List<T>::print()
 		cout<<"The contents are: ";
 		while(current!=NULL)
 		{
-			cout<<current->data<<' ';
+			cout<<current->data<<" | ";
 			current = current->next;
 		}
 		cout<<endl;

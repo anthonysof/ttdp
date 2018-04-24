@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <math.h>
+#include "List.h"
 using namespace std;
 
 class POI {
@@ -55,6 +56,9 @@ public:
 			}
 		}
 	}
+	int getId(){
+		return this->id;
+	}
 
 
 
@@ -72,39 +76,11 @@ public:
 
 };
 
-struct node {
-	POI point;
-	node *prev;
-	node *next;
-};
-
-/*class LinkedList {
-private:
-	node *head, *tail;
-public:
-	double time;
-	LinkedList(POI hotel){
-		head = hotel;
-		tail = hotel;
-		time = 0;
-	}
-
-	void insert_position(int pos, POI value)
+std::ostream& operator<<(std::ostream& os, POI& p)
 {
-	node *pre = new node;
-	node *cur = new node;
-	node *temp = new node;
-	cur = head;
-	for(int i=1; i<pos; i++)
-	{
-		pre = cur;
-		cur = cur->next;
-	}
-	temp->point = value;
-	pre->next = temp;
-	temp->next = cur;
+	os<<"\nId: "<<p.getId()<<" Score: "<<p.getScore()<<endl;
+	return os;
 }
-}  */
 
 double calculateDistance(POI start, POI end){
 	double distance;
@@ -146,7 +122,9 @@ int main() {
 	inFile >> id >> x >> y >> d >> s >> open >> close;
 	POI * hotel = new POI(id, x, y, open, close);
 	POI pois[N+1];
-
+	List<POI> listapoi;
+	
+	
 	int counter = 0;
 	while(!inFile.eof()){
 		inFile >> id >> x >> y >> d >> s;
@@ -165,7 +143,13 @@ int main() {
 
 	inFile.close();
 	
-
+	listapoi.insertStart(pois[1]);
+	listapoi.insertPos(pois[2],1);
+	listapoi.insertPos(pois[3],2);
+	listapoi.print();
+	
+	cout << "----------------" <<endl;
+	cout<< pois[3] << endl;
 	cout << K << endl;
 	cout << M << endl;
 	cout << SD << endl;
