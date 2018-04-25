@@ -13,7 +13,7 @@ class List
 		List();
 		~List();
 		void print();
-		int search(const T&);
+		int search(T&);		
 		bool isEmpty();
 		int insertStart(const T& dataIn);
 		int insertEnd(const T& dataIn);
@@ -122,7 +122,7 @@ int List<T>::insertPos(const T& dataIn, int pos)
 
 
 template<typename T>
-int List<T>::search(const T& key)
+int List<T>::search(T& key)
 {
 	ListNode<T>* temp = head;
 	int count = 0;
@@ -134,6 +134,7 @@ int List<T>::search(const T& key)
 	if (temp) return count;
 	return -1;
 }
+
 
 template<typename T>
 void List<T>::print()
@@ -147,7 +148,7 @@ void List<T>::print()
 		cout<<"The contents are: ";
 		while(current!=NULL)
 		{
-			cout<<current->data<<" | ";
+			cout<<current->data<<"->";
 			current = current->next;
 		}
 		cout<<endl;

@@ -16,7 +16,7 @@ private:
 
 public:
 	
-
+	int equals(const POI&);
 	 void POIinitilize(int vn,double xcoord,double ycoord,int dur,int score, int opent[], int closet[]){
 		this->id = vn;
 		this->x = xcoord;
@@ -73,12 +73,20 @@ public:
 			close[i] = closet;
 		}
 	}
-
+	bool operator==(const POI& rhs) const
+{
+	return id == rhs.id;
+}
+	bool operator!=(const POI& rhs) const
+{
+	return id != rhs.id;
+}
 };
+
 
 std::ostream& operator<<(std::ostream& os, POI& p)
 {
-	os<<"\nId: "<<p.getId()<<" Score: "<<p.getScore()<<endl;
+	os<<"Id: "<<p.getId()<<" Score: "<<p.getScore()<<" ";
 	return os;
 }
 
@@ -104,11 +112,23 @@ double calculateOf(POI start, POI end, POI between){
 	return of;
 }
 
+double timeAddition(POI start, POI end, POI between)
+{
+	return calculateDistance(start,between)+between.getDuration()+calculateDistance(between,end)-calculateDistance(start,end);
+	
+}
 
-int main() {
+bool validateTime(double currentTime, double endOfTour)
+{
+	return (currentTime<endOfTour);
+}
+
+
+
+int main(int argc, char* argv[]) {
 	ifstream inFile;
 	int K, M, SD, N, id;
-	double x, y;
+	double x, y, currentTime;
 	int d, s, open, close;
 	int opena[7];
 	int closea[7];
@@ -122,6 +142,11 @@ int main() {
 	inFile >> id >> x >> y >> d >> s >> open >> close;
 	POI * hotel = new POI(id, x, y, open, close);
 	POI pois[N+1];
+	List<POI>* dromologia[M];
+	for(int i=0; i<M; i++){
+		dromologia[i] = new List<POI>(); 
+	}
+	
 	List<POI> listapoi;
 	
 	
@@ -143,13 +168,48 @@ int main() {
 
 	inFile.close();
 	
-	listapoi.insertStart(pois[1]);
-	listapoi.insertPos(pois[2],1);
-	listapoi.insertPos(pois[3],2);
+	listapoi.insertStart(*hotel);
+	
+	listapoi.insertEnd(*hotel);
 	listapoi.print();
 	
+	double maxOf = 0;
+	
+	for(int i=1;i<listapoi.length() && currentTime <= close;i++){
+	POI start, end, between;
+	double	currentTimeTemp = currentTime;
+		for(int j=1; j<N; j++){
+			bool flag = true;
+			listapoi.findElem(i-1,start);
+			listapoi.findElem(i+1,end);
+			if(currentTime+timeAddition(start,end,pois[j])<=end.getCloseTime(SD))
+			{
+				currentTimeTemp = currentTime + timeAddition(start,end,pois[j]);
+				for(int y=i+1; y<listapoi.length(); y++)
+				{
+					listapoi.findElem(y-1, start);
+					listapoi.findElem(y+1,end);
+					listapoi.findElem(y, between);
+					if(timeAddition(start,end,between)>=between.getCloseTime(SD)){
+						flag = false;
+					}
+					currentTimeTemp+=timeAddition(start,end,between);
+				}
+				if (flag && listapoi.search(pois[j])==-1){
+				listapoi.insertPos(pois[j],i);
+				currentTime += timeAddition(start,end,pois[j]);
+				cout<<currentTime<<endl;
+				}
+				
+			}
+	
+		}
+	}
+	listapoi.print();
+	cout << SD << endl;
+	cout << close << endl;
 	cout << "----------------" <<endl;
-	cout<< pois[3] << endl;
+	cout<< pois[1] << endl;
 	cout << K << endl;
 	cout << M << endl;
 	cout << SD << endl;
