@@ -86,7 +86,7 @@ public:
 
 std::ostream& operator<<(std::ostream& os, POI& p)
 {
-	os<<"Id: "<<p.getId()<<" Score: "<<p.getScore()<<" ";
+	os<<"Id: "<<p.getId()<<"\tScore: "<<p.getScore()<<endl;
 	return os;
 }
 
@@ -173,24 +173,63 @@ int main(int argc, char* argv[]) {
 	listapoi.insertEnd(*hotel);
 	listapoi.print();
 	
+
+
+	currentTime = hotel->getOpenTime(SD);
+	for (int i=1; i < pois.length(); i++){
+		size_t list_sz = listapoi.length();
+		for (int j=1; j < list_sz; j++){
+			if(j+1 >= list_sz and j != 1){
+				printf("-----ULTRA BUGS-----\n");
+				break;
+			}
+			else {
+				printf("-----CLEAR-----\n");
+			}
+			POI start, end, between;
+			listapoi.findElem(j-1, start);
+			listapoi.findElem(j, end);
+			double currentTimeTemp = currentTime + timeAddition(start, end, pois[j]);
+			if(currentTimeTemp <= end.getCloseTime(SD) and currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD)){
+				for(int y=j+1; y < list_sz; y++){
+					listapoi.findElem(y-1, start);
+					listapoi.findElem(y+1,end);
+					listapoi.findElem(y, between);
+					if(currentTimeTemp + timeAddition(start,end,between) <= between.getCloseTime(SD)){
+						flag = false;
+					}
+					currentTimeTemp+=timeAddition(start,end,between);
+				}
+			}
+		}
+	}
+
+
+	// TO MOUNI
 	double maxOf = 0;
-	
-	for(int i=1;i<listapoi.length() && currentTime <= close;i++){
-	POI start, end, between;
-	double	currentTimeTemp = currentTime;
+	currentTime = hotel->getOpenTime(SD);
+	for(int i=1; i<listapoi.length() and currentTime <= hotel->getCloseTime(SD); i++){
+		if(i+1 >= listapoi.length()){
+			printf("-----ULTRA BUGS-----\n");
+			break;
+		}
+		else{
+			printf("-----CLEAR-----\n");
+		}
+		POI start, end, between;
 		for(int j=1; j<N; j++){
 			bool flag = true;
 			listapoi.findElem(i-1,start);
 			listapoi.findElem(i+1,end);
-			if(currentTime+timeAddition(start,end,pois[j])<=end.getCloseTime(SD))
+			double currentTimeTemp = currentTime + timeAddition(start,end,pois[j]);
+			if(currentTimeTemp <= end.getCloseTime(SD) and currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD))
 			{
-				currentTimeTemp = currentTime + timeAddition(start,end,pois[j]);
 				for(int y=i+1; y<listapoi.length(); y++)
 				{
 					listapoi.findElem(y-1, start);
 					listapoi.findElem(y+1,end);
 					listapoi.findElem(y, between);
-					if(timeAddition(start,end,between)>=between.getCloseTime(SD)){
+					if(currentTimeTemp + timeAddition(start,end,between) <= between.getCloseTime(SD)){
 						flag = false;
 					}
 					currentTimeTemp+=timeAddition(start,end,between);
@@ -199,12 +238,14 @@ int main(int argc, char* argv[]) {
 				listapoi.insertPos(pois[j],i);
 				currentTime += timeAddition(start,end,pois[j]);
 				cout<<currentTime<<endl;
+				cout << "Last Closing time: " << pois[j].getCloseTime(SD)<<" of pos "<<i << " with ID: " << pois[j].getId() << endl;
 				}
 				
 			}
 	
 		}
 	}
+	cout << currentTime << endl;
 	listapoi.print();
 	cout << SD << endl;
 	cout << close << endl;
