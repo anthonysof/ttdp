@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
 	inFile.ignore(256,'\n');
 	inFile >> id >> x >> y >> d >> s >> open >> close;
 	POI * hotel = new POI(id, x, y, open, close);
-	POI pois[N+1];
+	POI pois[N];
 	List<POI>* dromologia[M];
 	for(int i=0; i<M; i++){
 		dromologia[i] = new List<POI>(); 
@@ -172,33 +172,32 @@ int main(int argc, char* argv[]) {
 	
 	listapoi.insertEnd(*hotel);
 	listapoi.print();
-	
-
 
 	currentTime = hotel->getOpenTime(SD);
-	for (int i=1; i < pois.length(); i++){
+	for (int i=1; i < N; i++){
 		size_t list_sz = listapoi.length();
 		for (int j=1; j < list_sz; j++){
 			if(j+1 >= list_sz and j != 1){
-				printf("-----ULTRA BUGS-----\n");
 				break;
 			}
-			else {
-				printf("-----CLEAR-----\n");
-			}
-			POI start, end, between;
+			POI start, end;
 			listapoi.findElem(j-1, start);
 			listapoi.findElem(j, end);
 			double currentTimeTemp = currentTime + timeAddition(start, end, pois[j]);
 			if(currentTimeTemp <= end.getCloseTime(SD) and currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD)){
+				bool outOfTime = false;
 				for(int y=j+1; y < list_sz; y++){
-					listapoi.findElem(y-1, start);
-					listapoi.findElem(y+1,end);
-					listapoi.findElem(y, between);
-					if(currentTimeTemp + timeAddition(start,end,between) <= between.getCloseTime(SD)){
-						flag = false;
+					POI next;
+					listapoi.findElem(y, next);
+					if(currentTimeTemp > next.getCloseTime(SD)){
+						outOfTime = true;
 					}
-					currentTimeTemp+=timeAddition(start,end,between);
+				}
+				if (!outOfTime){
+					listapoi.insertPos(pois[i],j);
+					currentTime += currentTimeTemp;
+					cout << currentTime << endl;
+					cout << "Last Closing time: " << pois[i].getCloseTime(SD)<<" of pos " << j << " with ID: " << pois[i].getId() << endl;
 				}
 			}
 		}
@@ -206,45 +205,45 @@ int main(int argc, char* argv[]) {
 
 
 	// TO MOUNI
-	double maxOf = 0;
-	currentTime = hotel->getOpenTime(SD);
-	for(int i=1; i<listapoi.length() and currentTime <= hotel->getCloseTime(SD); i++){
-		if(i+1 >= listapoi.length()){
-			printf("-----ULTRA BUGS-----\n");
-			break;
-		}
-		else{
-			printf("-----CLEAR-----\n");
-		}
-		POI start, end, between;
-		for(int j=1; j<N; j++){
-			bool flag = true;
-			listapoi.findElem(i-1,start);
-			listapoi.findElem(i+1,end);
-			double currentTimeTemp = currentTime + timeAddition(start,end,pois[j]);
-			if(currentTimeTemp <= end.getCloseTime(SD) and currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD))
-			{
-				for(int y=i+1; y<listapoi.length(); y++)
-				{
-					listapoi.findElem(y-1, start);
-					listapoi.findElem(y+1,end);
-					listapoi.findElem(y, between);
-					if(currentTimeTemp + timeAddition(start,end,between) <= between.getCloseTime(SD)){
-						flag = false;
-					}
-					currentTimeTemp+=timeAddition(start,end,between);
-				}
-				if (flag && listapoi.search(pois[j])==-1){
-				listapoi.insertPos(pois[j],i);
-				currentTime += timeAddition(start,end,pois[j]);
-				cout<<currentTime<<endl;
-				cout << "Last Closing time: " << pois[j].getCloseTime(SD)<<" of pos "<<i << " with ID: " << pois[j].getId() << endl;
-				}
+	// double maxOf = 0;
+	// currentTime = hotel->getOpenTime(SD);
+	// for(int i=1; i<listapoi.length() and currentTime <= hotel->getCloseTime(SD); i++){
+	// 	if(i+1 >= listapoi.length()){
+	// 		printf("-----ULTRA BUGS-----\n");
+	// 		break;
+	// 	}
+	// 	else{
+	// 		printf("-----CLEAR-----\n");
+	// 	}
+	// 	POI start, end, between;
+	// 	for(int j=1; j<N; j++){
+	// 		bool flag = true;
+	// 		listapoi.findElem(i-1,start);
+	// 		listapoi.findElem(i+1,end);
+	// 		double currentTimeTemp = currentTime + timeAddition(start,end,pois[j]);
+	// 		if(currentTimeTemp <= end.getCloseTime(SD) and currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD))
+	// 		{
+	// 			for(int y=i+1; y<listapoi.length(); y++)
+	// 			{
+	// 				listapoi.findElem(y-1, start);
+	// 				listapoi.findElem(y+1,end);
+	// 				listapoi.findElem(y, between);
+	// 				if(currentTimeTemp + timeAddition(start,end,between) <= between.getCloseTime(SD)){
+	// 					flag = false;
+	// 				}
+	// 				currentTimeTemp+=timeAddition(start,end,between);
+	// 			}
+	// 			if (flag && listapoi.search(pois[j])==-1){
+	// 			listapoi.insertPos(pois[j],i);
+	// 			currentTime += timeAddition(start,end,pois[j]);
+	// 			cout<<currentTime<<endl;
+	// 			cout << "Last Closing time: " << pois[j].getCloseTime(SD)<<" of pos "<<i << " with ID: " << pois[j].getId() << endl;
+	// 			}
 				
-			}
+	// 		}
 	
-		}
-	}
+	// 	}
+	// }
 	cout << currentTime << endl;
 	listapoi.print();
 	cout << SD << endl;
