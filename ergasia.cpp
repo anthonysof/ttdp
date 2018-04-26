@@ -279,15 +279,16 @@ for(int r = 0; r < epan; r++)
 	for(int i=0; i<M; i++)
 	{
 		int list_sz = dromologia[i].length();
-		int randomIndex = rand() % list_sz + 1;
-		int deletionCount = list_sz * pie;
+		int randomIndex = rand() % (list_sz -1) + 1;
+		int deletionCount = list_sz-2 * pie;
 		int counter = 0;
-		POI temp;
+		int j = randomIndex;
+
 		while(counter < deletionCount)
 		{
-			for(int j = randomIndex; j < list_sz && counter<deletionCount; j++)
+			for(j = randomIndex; j < list_sz and counter<deletionCount; j++)
 			{
-				POI start, end;
+				POI start, end, temp;
 				dromologia[i].findElem(j, temp);
 				if (temp == *hotel){
 					randomIndex = 1;
@@ -296,7 +297,9 @@ for(int r = 0; r < epan; r++)
 				dromologia[i].findElem(j-1,start);
 				dromologia[i].findElem(j+1,end);
 				dromologia[i].deletePos(temp, j);
+				cout<<"Deleted: "<<temp<<endl;
 				currentTime[i] -= timeAddition(start, end, temp);
+				cout<<currentTime[i]<<endl;
 				counter++;	
 			}
 			counter++;
