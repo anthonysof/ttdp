@@ -3,6 +3,8 @@
 #include <string>
 #include <math.h>
 #include <cstdlib>
+#include <iterator>
+#include <algorithm>
 #include "List.h"
 using namespace std;
 
@@ -14,10 +16,10 @@ private:
 	int s;
 	int open[7];
 	int close[7];
+	double arrivalTime;
 
 public:
 	
-	int equals(const POI&);
 	 void POIinitilize(int vn,double xcoord,double ycoord,int dur,int score, int opent[], int closet[]){
 		this->id = vn;
 		this->x = xcoord;
@@ -61,7 +63,12 @@ public:
 		return this->id;
 	}
 
-
+	double getArrival(){
+		return this->arrivalTime;
+	}
+	void setArrival(double time){
+		arrivalTime = time;
+	}
 
 	POI() { }
 	//hotel constructor
@@ -101,7 +108,7 @@ double calculateDistance(POI start, POI end){
 	return sqrt(distance);
 }
 
-int calculateScore(List<POI> d[], int M)
+int calculateScore(int M ,List<POI> d[])
 {
 	POI temp;
 	int score = 0;
@@ -137,9 +144,9 @@ bool validateTime(double currentTime, double endOfTour)
 
 
 int main(int argc, char* argv[]) {
-	ifstream inFile;
 	int epan = atoi(argv[1]); //FIX ME
 	double pie = atof(argv[2]);
+	string filename = argv[3];
 	int K, M, SD, N, id;
 	double x, y;
 	int d, s, open, close;
@@ -148,19 +155,18 @@ int main(int argc, char* argv[]) {
 	string NWLN = "\n";
 	string garbagecan;
 
-	inFile.open("t101.txt");
+	ifstream inFile(argv[3]);
 
 	inFile >> K >> M >> SD >> N;
 	inFile.ignore(256,'\n');
 	inFile >> id >> x >> y >> d >> s >> open >> close;
 	POI * hotel = new POI(id, x, y, open, close);
 	POI pois[N];
-	List<POI>* dromologia[M];
+	List<POI> dromologia[M];
 	double currentTime[M]; 
-	for(int i=0; i<M; i++){
-		dromologia[i] = new List<POI>(); 
-		dromologia[i]->insertStart(*hotel);
-		dromologia[i]->insertEnd(*hotel);
+	for(int i=0; i<M; i++){ 
+		dromologia[i].insertStart(*hotel);
+		dromologia[i].insertEnd(*hotel);
 		currentTime[i] = hotel->getOpenTime(SD);
 	}
 	
@@ -183,14 +189,18 @@ int main(int argc, char* argv[]) {
 
 	int SD_ = SD;
 	int maxScore = 0;
-	List<POI>* finalDromologia[M];
+	List<POI> finalDromologia[M];
+
+cout<<"Arxi tou tour "<<currentTime[0]<<endl;
+cout<<"--_AATESTAA__--"<<calculateDistance(pois[1],*hotel)<<endl;
+cout<<timeAddition(*hotel,*hotel,pois[1])<<endl;
 	
 for(int r = 0; r < epan; r++)
 {
 	for (int i=1; i < N; i++){
 		bool found = false;
 		for(int m=0; m < M; m++){
-			if(dromologia[m]->search(pois[i])!=-1){
+			if(dromologia[m].search(pois[i])!=-1){
 				found = true;
 				break;
 			}
@@ -202,32 +212,33 @@ for(int r = 0; r < epan; r++)
 		double savedTime;
 		SD = SD_;
 		for(int m=0; m < M; m++){
-			size_t list_sz = dromologia[m]->length();
+			int list_sz = dromologia[m].length();
 			for (int j=1; j < list_sz; j++){
 				if(j+1 >= list_sz and j != 1){
 					break;
 				}
 				POI start, end;
-				dromologia[m]->findElem(j-1, start);
-				dromologia[m]->findElem(j, end);
-				double currentTimeTemp = currentTime[m] + timeAddition(start, end, pois[j]);
+				dromologia[m].findElem(j-1, start);
+				dromologia[m].findElem(j, end);
+				double currentTimeTemp = currentTime[m] + timeAddition(start, end, pois[i]);
 				if(currentTimeTemp <= end.getCloseTime(SD) and currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD)){
 					bool outOfTime = false;
 					for(int y=j+1; y < list_sz; y++){
 						POI next;
-						dromologia[m]->findElem(y, next);
+						dromologia[m].findElem(y, next);
 						if(currentTimeTemp > next.getCloseTime(SD)){
 							outOfTime = true;
 							break;
 						}
 					}
 					if (!outOfTime){
-						double of = calculateOf(start, end, pois[j]);
+						double of = calculateOf(start, end, pois[i]);
 						if (maxOf < of){
 							maxOf = of;
 							savedJ = j;
 							savedM = m;
 							savedTime = currentTimeTemp;
+							cout<<"PRINT SAVE: "<<savedTime<<endl;
 						}
 					}
 				}
@@ -238,122 +249,97 @@ for(int r = 0; r < epan; r++)
 			}
 		}
 		if (maxOf > 0){
-			dromologia[savedM]->insertPos(pois[i], savedJ);
-			currentTime[savedM] += savedTime;
-			cout << currentTime[savedM] << endl;
+			dromologia[savedM].insertPos(pois[i], savedJ);
+			currentTime[savedM] = savedTime;
+
+			cout<<currentTime[savedM]<<endl;
+			//cout << currentTime[savedM] << endl;
 			//cout << "Last Closing time: " << pois[i].getCloseTime(SD)<<" of pos " << j << " with ID: " << pois[i].getId() << endl;
 		}
 	}
-	int totalScore = calculateScore(*dromologia, M);
+	int totalScore = calculateScore(M,dromologia);
 	if (maxScore<totalScore)
 	{
 		maxScore = totalScore;
 		copy(dromologia, dromologia+M, finalDromologia);
+		
 	}
 	// for (int i=0; i<M; i++){
 	// 	dromologia[i]->print();
 	// }
 	for(int i=0; i<M; i++)
 	{
-		size_t list_sz = dromologia[i]->length();
-		int randomIndex = rand() % list_sz;
+		int list_sz = dromologia[i].length();
+		int randomIndex = rand() % list_sz + 1;
+		int deletionCount = list_sz * pie;
+		int counter = 0;
 		POI temp;
-		for(int j=randomIndex; j<list_sz * pie; j++)
-		{	
-			if(j == dromologia[i]->length()-1)
-				break;
-			dromologia[i]->findElem(j, temp);
-			if (temp == *hotel){
-				break;
+		while(counter < deletionCount)
+		{
+			for(int j = randomIndex; j < list_sz && counter<deletionCount; j++)
+			{
+				POI start, end;
+				dromologia[i].findElem(j, temp);
+				if (temp == *hotel){
+					randomIndex = 1;
+					break;
+				}
+				dromologia[i].findElem(j-1,start);
+				dromologia[i].findElem(j+1,end);
+				dromologia[i].deletePos(temp, j);
+				currentTime[i] -= timeAddition(start, end, temp);
+				counter++;	
 			}
-			dromologia[i]->deletePos(temp, j);
-			if (j >= dromologia[i]->length()-1){
-				break;
-			}
+			counter++;
 		}
-		currentTime[i] = hotel->getOpenTime(SD);
-		for (int j=1; j < list_sz; j++){
-			if(j+1 >= list_sz and j != 1){
-				break;
-			}
-			POI start, end;
-			dromologia[i]->findElem(j-1, start);
-			dromologia[i]->findElem(j, end);
-			currentTime[i] += timeAddition(start, end, pois[j]);
-		}
+		
+		//OLD DELETION
+		// for(int j=randomIndex; j<list_sz * pie; j++)
+		// {	
+		// 	POI start, end;
+		// 	dromologia[i].findElem(j, temp);
+		// 	if (temp == *hotel){
+		// 		break;
+		// 	}
+		// 	dromologia[i].findElem(j-1,start);
+		// 	dromologia[i].findElem(j+1,end);
+		// 	dromologia[i].deletePos(temp, j);
+		// 	currentTime[i] -= timeAddition(start, end, temp); 
+		// }
+		// currentTime[i] = hotel->getOpenTime(SD);
+		// for (int j=1; j < list_sz; j++){
+		// 	if(j+1 >= list_sz and j != 1){
+		// 		break;
+		// 	}
+		// 	POI start, end;
+		// 	dromologia[i].findElem(j-1, start);
+		// 	dromologia[i].findElem(j, end);
+		// 	currentTime[i] += timeAddition(start, end, pois[j]);
+		// }
 	}
-	cout<<"Max Score: "<<maxScore<<endl;
-	for (int i=0; i<M; i++){
-		dromologia[i]->print();
+	//-------------__I WANT TO END MY LIFE------------
+
+	// cout<<"Max Score: "<<maxScore<<endl;
+	// for (int i=0; i<M; i++){
+	// 	dromologia[i]->print();
+	// }
+	// cout<<"----END REPEAT----"<<endl;
+	for(int i=0; i<M; i++){ 
+		currentTime[i] = hotel->getOpenTime(SD);
 	}
 }
-	// for (int i=0; i<M; i++){
-	// 	finalDromologia[i]->print();
-	// }
+
+	cout<<"----------_FINAL_-----------"<<endl;
+	for (int i=0; i<M; i++){
+		cout<<"Dromologio No: "<<i<<endl;
+		finalDromologia[i].print();
+
+	}
+	cout<<"Max score pou vrika: "<<maxScore<<endl;
+	cout<<"Score final: "<<calculateScore(M,finalDromologia)<<endl;
 
 
-	// TO MOUNI
-	// double maxOf = 0;
-	// currentTime[m] = hotel->getOpenTime(SD);
-	// for(int i=1; i<dromologia[m]->length() and currentTime[m] <= hotel->getCloseTime(SD); i++){
-	// 	if(i+1 >= dromologia[m]->length()){
-	// 		printf("-----ULTRA BUGS-----\n");
-	// 		break;
-	// 	}
-	// 	else{
-	// 		printf("-----CLEAR-----\n");
-	// 	}
-	// 	POI start, end, between;
-	// 	for(int j=1; j<N; j++){
-	// 		bool flag = true;
-	// 		dromologia[m]->findElem(i-1,start);
-	// 		dromologia[m]->findElem(i+1,end);
-	// 		double currentTimeTemp = currentTime[m] + timeAddition(start,end,pois[j]);
-	// 		if(currentTimeTemp <= end.getCloseTime(SD) and currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD))
-	// 		{
-	// 			for(int y=i+1; y<dromologia[m]->length(); y++)
-	// 			{
-	// 				dromologia[m]->findElem(y-1, start);
-	// 				dromologia[m]->findElem(y+1,end);
-	// 				dromologia[m]->findElem(y, between);
-	// 				if(currentTimeTemp + timeAddition(start,end,between) <= between.getCloseTime(SD)){
-	// 					flag = false;
-	// 				}
-	// 				currentTimeTemp+=timeAddition(start,end,between);
-	// 			}
-	// 			if (flag && dromologia[m]->search(pois[j])==-1){
-	// 			dromologia[m]->insertPos(pois[j],i);
-	// 			currentTime[m] += timeAddition(start,end,pois[j]);
-	// 			cout<<currentTime<<endl;
-	// 			cout << "Last Closing time: " << pois[j].getCloseTime(SD)<<" of pos "<<i << " with ID: " << pois[j].getId() << endl;
-	// 			}
-				
-	// 		}
 	
-	// 	}
-	// }
-	//cout << currentTime[m] << endl;
-	//dromologia[m]->print();
-	cout << SD << endl;
-	cout << close << endl;
-	cout << "----------------" <<endl;
-	cout<< pois[1] << endl;
-	cout << K << endl;
-	cout << M << endl;
-	cout << SD << endl;
-	cout << N << endl;
-	cout << x << endl;
-	cout << y << endl;
-	cout << open << endl;
-	cout << close << endl;
-	cout << "A POI RE!!!"<<endl;
-	cout << pois[3].getCoordinates('x')<<" "<<pois[3].getCoordinates('y')<<endl;
-	cout << pois[3].getDuration()<<endl;
-	cout << pois[3].getScore()<<endl;
-	cout << calculateOf(pois[3],pois[1],pois[2])<<endl;
-	cout << calculateDistance(*hotel,pois[2])<<endl;
-
-
 	delete hotel;
 	return 0;
 
