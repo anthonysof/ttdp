@@ -16,7 +16,7 @@ private:
 	int s;
 	int open[7];
 	int close[7];
-	double arrivalTime;
+	bool selected;
 
 public:
 	
@@ -30,6 +30,7 @@ public:
 			this->open[i] = opent[i];
 			this->close[i] = closet[i];
 		}
+		selected = false;
 	}
 	double getCoordinates(char d){
 		if(d == 'x'){
@@ -63,11 +64,11 @@ public:
 		return this->id;
 	}
 
-	double getArrival(){
-		return this->arrivalTime;
+	void selectPoi(){
+		selected = true;
 	}
-	void setArrival(double time){
-		arrivalTime = time;
+	bool getSelected(){
+		return selected;
 	}
 
 	POI() { }
@@ -190,17 +191,14 @@ int main(int argc, char* argv[]) {
 	int SD_ = SD;
 	int maxScore = 0;
 	List<POI> finalDromologia[M];
-
 cout<<"Arxi tou tour "<<currentTime[0]<<endl;
-cout<<"--_AATESTAA__--"<<calculateDistance(pois[1],*hotel)<<endl;
-cout<<timeAddition(*hotel,*hotel,pois[1])<<endl;
 	
 for(int r = 0; r < epan; r++)
 {
 	for (int i=1; i < N; i++){
 		bool found = false;
 		for(int m=0; m < M; m++){
-			if(dromologia[m].search(pois[i])!=-1){
+			if(dromologia[m].search(pois[i])!=-1 and pois[i].getSelected()){
 				found = true;
 				break;
 			}
@@ -250,9 +248,10 @@ for(int r = 0; r < epan; r++)
 		}
 		if (maxOf > 0){
 			dromologia[savedM].insertPos(pois[i], savedJ);
+			pois[i].selectPoi();
 			currentTime[savedM] = savedTime;
 
-			cout<<currentTime[savedM]<<endl;
+			//cout<<currentTime[savedM]<<endl;
 			//cout << currentTime[savedM] << endl;
 			//cout << "Last Closing time: " << pois[i].getCloseTime(SD)<<" of pos " << j << " with ID: " << pois[i].getId() << endl;
 		}
@@ -260,6 +259,7 @@ for(int r = 0; r < epan; r++)
 	int totalScore = calculateScore(M,dromologia);
 	if (maxScore<totalScore)
 	{
+		//cout<<"*********ASTERISK*****MPHKA***************"<<endl;
 		maxScore = totalScore;
 		copy(dromologia, dromologia+M, finalDromologia);
 		
@@ -267,6 +267,15 @@ for(int r = 0; r < epan; r++)
 	// for (int i=0; i<M; i++){
 	// 	dromologia[i]->print();
 	// }
+	
+	//--INSERT RITUAL TO APPEASE THE MACHINE SPIRIT HERE--
+	// The soul of the Machine God surrounds thee.
+	// The power of the Machine God invests thee.
+	// The hate of the Machine God drives thee.
+	// The Machine God endows thee with life.
+	// COMPILE! (and dont print garbage)
+	if(r == epan-1)
+		break;
 	for(int i=0; i<M; i++)
 	{
 		int list_sz = dromologia[i].length();
@@ -293,45 +302,15 @@ for(int r = 0; r < epan; r++)
 			counter++;
 		}
 		
-		//OLD DELETION
-		// for(int j=randomIndex; j<list_sz * pie; j++)
-		// {	
-		// 	POI start, end;
-		// 	dromologia[i].findElem(j, temp);
-		// 	if (temp == *hotel){
-		// 		break;
-		// 	}
-		// 	dromologia[i].findElem(j-1,start);
-		// 	dromologia[i].findElem(j+1,end);
-		// 	dromologia[i].deletePos(temp, j);
-		// 	currentTime[i] -= timeAddition(start, end, temp); 
-		// }
-		// currentTime[i] = hotel->getOpenTime(SD);
-		// for (int j=1; j < list_sz; j++){
-		// 	if(j+1 >= list_sz and j != 1){
-		// 		break;
-		// 	}
-		// 	POI start, end;
-		// 	dromologia[i].findElem(j-1, start);
-		// 	dromologia[i].findElem(j, end);
-		// 	currentTime[i] += timeAddition(start, end, pois[j]);
-		// }
 	}
-	//-------------__I WANT TO END MY LIFE------------
-
-	// cout<<"Max Score: "<<maxScore<<endl;
-	// for (int i=0; i<M; i++){
-	// 	dromologia[i]->print();
+	// for(int i=0; i<M; i++){ 
+	// 	currentTime[i] = hotel->getOpenTime(SD);
 	// }
-	// cout<<"----END REPEAT----"<<endl;
-	for(int i=0; i<M; i++){ 
-		currentTime[i] = hotel->getOpenTime(SD);
-	}
 }
 
 	cout<<"----------_FINAL_-----------"<<endl;
 	for (int i=0; i<M; i++){
-		cout<<"Dromologio No: "<<i<<endl;
+		cout<<"Dromologio No: "<<i+1<<endl;
 		finalDromologia[i].print();
 
 	}
