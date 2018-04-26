@@ -13,7 +13,7 @@ class List
 		List();
 		~List();
 		void print();
-		int search(T&);		
+		int search(T&);
 		bool isEmpty();
 		int insertStart(const T& dataIn);
 		int insertEnd(const T& dataIn);
@@ -145,7 +145,7 @@ void List<T>::print()
 	}else
 	{
 		ListNode<T> *current = head;
-		cout<<"The contents are: ";
+		cout<<"The contents are:\n";
 		while(current!=NULL)
 		{
 			cout<<current->data<<"->";
