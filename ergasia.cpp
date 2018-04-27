@@ -3,8 +3,8 @@
 #include <string>
 #include <math.h>
 #include <cstdlib>
-#include <iterator>
-#include <algorithm>
+#include <iterator>  //to remove
+#include <algorithm>	//to remove
 #include "List.h"
 using namespace std;
 
@@ -137,7 +137,7 @@ double timeAddition(POI start, POI end, POI between)
 	
 }
 
-bool validateTime(double currentTime, double endOfTour)
+bool validateTime(double currentTime, double endOfTour)		//to remove
 {
 	return (currentTime<endOfTour);
 }
@@ -191,6 +191,7 @@ int main(int argc, char* argv[]) {
 	int SD_ = SD;
 	int maxScore = 0;
 	List<POI> finalDromologia[M];
+	
 cout<<"Arxi tou tour "<<currentTime[0]<<endl;
 	
 for(int r = 0; r < epan; r++)
@@ -247,7 +248,7 @@ for(int r = 0; r < epan; r++)
 			}
 		}
 		if (maxOf > 0){
-			dromologia[savedM].insertPos(pois[i], savedJ);
+			dromologia[savedM].insertPos(pois[i], savedJ);			
 			pois[i].selectPoi();
 			currentTime[savedM] = savedTime;
 
@@ -257,7 +258,7 @@ for(int r = 0; r < epan; r++)
 		}
 	}
 	int totalScore = calculateScore(M,dromologia);
-	if (maxScore<totalScore)
+	if (maxScore<totalScore)									
 	{
 		//cout<<"*********ASTERISK*****MPHKA***************"<<endl;
 		maxScore = totalScore;
@@ -281,29 +282,36 @@ for(int r = 0; r < epan; r++)
 		int list_sz = dromologia[i].length();
 		int randomIndex = rand() % (list_sz -1) + 1;
 		int deletionCount = list_sz-2 * pie;
-		int counter = 0;
+//		int counter = 0;
 		int j = randomIndex;
 
-		while(counter < deletionCount)
-		{
-			for(j = randomIndex; j < list_sz and counter<deletionCount; j++)
+			for(int counter = 0; counter <= deletionCount; counter++)
 			{
-				POI start, end, temp;
-				dromologia[i].findElem(j, temp);
-				if (temp == *hotel){
+				POI temp;
+				dromologia[i].findElem(randomIndex, temp);
+				if(temp == *hotel);
+				{
 					randomIndex = 1;
-					break;
 				}
-				dromologia[i].findElem(j-1,start);
-				dromologia[i].findElem(j+1,end);
-				dromologia[i].deletePos(temp, j);
-				cout<<"Deleted: "<<temp<<endl;
-				currentTime[i] -= timeAddition(start, end, temp);
-				cout<<currentTime[i]<<endl;
-				counter++;	
+				dromologia[i].deletePos(temp, randomIndex);
 			}
-			counter++;
-		}
+			
+//			for(j = randomIndex; j < list_sz and counter<deletionCount; j++)		//palio deletion me 8eseis la8os
+//			{
+//				POI start, end, temp;
+//				dromologia[i].findElem(j, temp);
+//				if (temp == *hotel){
+//					j = 1;
+//					break;
+//				}
+//				dromologia[i].findElem(j-1,start);
+//				dromologia[i].findElem(j+1,end);
+//				dromologia[i].deletePos(temp, j);
+//				cout<<"Deleted: "<<temp<<endl;
+//				currentTime[i] -= timeAddition(start, end, temp);
+//				cout<<currentTime[i]<<endl;
+//				counter++;	
+//			}
 		
 	}
 	// for(int i=0; i<M; i++){ 
@@ -320,9 +328,10 @@ for(int r = 0; r < epan; r++)
 	cout<<"Max score pou vrika: "<<maxScore<<endl;
 	cout<<"Score final: "<<calculateScore(M,finalDromologia)<<endl;
 
+	cout<<hotel->getScore()<<endl;
 
 	
-	delete hotel;
+	//delete hotel;
 	return 0;
 
 
