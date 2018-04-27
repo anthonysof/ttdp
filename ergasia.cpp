@@ -209,7 +209,7 @@ for(int r = 0; r < epan; r++)
 				break;
 			}
 		}
-		if(found)
+		if(found or pois[i].getOpenTime(SD) == pois[i].getCloseTime(SD))
 		{
 			//cout<<"GEIA SOU VREEEE"<<endl;
 			continue;
@@ -228,7 +228,7 @@ for(int r = 0; r < epan; r++)
 				dromologia[m].findElem(j-1, start);
 				dromologia[m].findElem(j, end);
 				double currentTimeTemp = currentTime[m] + timeAddition(start, end, pois[i]);
-				if(currentTimeTemp <= end.getCloseTime(SD) and currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD)){
+				if(currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD)){
 					bool outOfTime = false;
 					for(int y=j+1; y < list_sz; y++){
 						POI next;
@@ -255,14 +255,19 @@ for(int r = 0; r < epan; r++)
 			}
 		}
 		if (maxOf > 0){
+			POI temp;
+			dromologia[savedM].findElem(savedJ, temp);
+			if(savedTime >= temp.getCloseTime(SD))
+			{
+				//cout<<"KAMPANAKI NTIN NTAN"<<endl;
+				continue;
+			}
 			dromologia[savedM].insertPos(pois[i], savedJ);			
-			pois[i].selectPoi();
 			currentTime[savedM] = savedTime;
-			//cout<<"Inserted: "<<pois[i]<<" in: "<<savedM<<" at pos: "<<savedJ<<endl;
-
-			//cout<<currentTime[savedM]<<endl;
+			// cout<<"Inserted: "<<pois[i]<<" in: "<<savedM<<" at pos: "<<savedJ<<endl;
+			// cout << "Last Closing time: " << pois[i].getCloseTime(SD)<<" of pos " << savedJ << " with ID: " << pois[i].getId() << endl;
+			// cout<<currentTime[savedM]<<endl;
 			//cout << currentTime[savedM] << endl;
-			//cout << "Last Closing time: " << pois[i].getCloseTime(SD)<<" of pos " << j << " with ID: " << pois[i].getId() << endl;
 		}
 	}
 	int totalScore = calculateScore(M,dromologia);
