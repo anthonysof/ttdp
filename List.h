@@ -12,9 +12,9 @@ class List
 	public:
 		List();
 		~List();
-		void print();
-		int search(T&);
-		bool isEmpty();
+		void print();		//τυπώνει τα περιεχόμενα της λίστας
+		int search(T& key);		//επιστρέφει την θέση του key στην λίστα, αλλιώς -1
+		bool isEmpty();		//επιστρέφει true ή false αν η λίστα είναι άδεια ή όχι
 		int insertStart(const T& dataIn);
 		int insertEnd(const T& dataIn);
 		int insertPos(const T& dataIn, int pos); //check!!!!
