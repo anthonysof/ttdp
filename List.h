@@ -13,6 +13,7 @@ class List
 		List();
 		~List();
 		void print();		//τυπώνει τα περιεχόμενα της λίστας
+		void print(ofstream&);
 		int search(T& key);		//επιστρέφει την θέση του key στην λίστα, αλλιώς -1
 		bool isEmpty();		//επιστρέφει true ή false αν η λίστα είναι άδεια ή όχι
 		int insertStart(const T& dataIn);
@@ -152,6 +153,25 @@ void List<T>::print()
 			current = current->next;
 		}
 		cout<<endl;
+	}
+}
+
+template<typename T>
+void List<T>::print(ofstream &tempResultsWrite)
+{
+	if(isEmpty())
+	{
+		tempResultsWrite<<"The List is empty"<<endl;
+	}else
+	{
+		ListNode<T> *current = head;
+		tempResultsWrite<<"The contents are:\n";
+		while(current!=NULL)
+		{
+			tempResultsWrite<<current->data<<"->";
+			current = current->next;
+		}
+		tempResultsWrite<<endl;
 	}
 }
 

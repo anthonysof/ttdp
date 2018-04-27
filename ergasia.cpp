@@ -157,6 +157,9 @@ int main(int argc, char* argv[]) {
 	string NWLN = "\n";
 	string garbagecan;
 
+	ofstream tempResultsWrite;
+	ifstream tempResultsRead;
+	
 	ifstream inFile(argv[3]);
 
 	inFile >> K >> M >> SD >> N;
@@ -200,7 +203,7 @@ for(int r = 0; r < epan; r++)
 	for (int i=1; i < N; i++){
 		bool found = false;
 		for(int m=0; m < M; m++){
-			if(dromologia[m].search(pois[i])!=-1 and pois[i].getSelected()){
+			if(dromologia[m].search(pois[i])!=-1){
 				found = true;
 
 				break;
@@ -255,7 +258,7 @@ for(int r = 0; r < epan; r++)
 			dromologia[savedM].insertPos(pois[i], savedJ);			
 			pois[i].selectPoi();
 			currentTime[savedM] = savedTime;
-			cout<<"Inserted: "<<pois[i]<<" in: "<<savedM<<" at pos: "<<savedJ<<endl;
+			//cout<<"Inserted: "<<pois[i]<<" in: "<<savedM<<" at pos: "<<savedJ<<endl;
 
 			//cout<<currentTime[savedM]<<endl;
 			//cout << currentTime[savedM] << endl;
@@ -267,8 +270,20 @@ for(int r = 0; r < epan; r++)
 	{
 		//cout<<"*********ASTERISK*****MPHKA***************"<<endl;
 		maxScore = totalScore;
-		copy(dromologia, dromologia+M, finalDromologia);
-		
+		//copy(dromologia, dromologia+M, finalDromologia);  COPY DE DOULEVEI? PAKISTAN TIME
+		tempResultsWrite.open("tempresults.txt", std::fstream::out);
+		for (int i=0; i<M; i++)
+		{
+		tempResultsWrite<<"\nDromologio No: "<<i+1<<endl;
+		dromologia[i].print(tempResultsWrite);
+		tempResultsWrite<<"me xrono: "<<currentTime[i]<<endl;
+		tempResultsWrite<<"End of tour is: "<<hotel->getCloseTime(SD)<<endl;
+		SD++;
+			if (SD > 6)
+				SD = 0;
+			
+		}
+		tempResultsWrite.close();
 	}
 	// for (int i=0; i<M; i++){
 	// 	dromologia[i]->print();
@@ -303,11 +318,11 @@ for(int r = 0; r < epan; r++)
 				dromologia[i].findElem(randomIndex+1,end);
 				
 				dromologia[i].deletePos(temp, randomIndex);
-				cout<<"Deleted: "<<temp<<"From drom: "<<i<<endl;
+				//cout<<"Deleted: "<<temp<<"From drom: "<<i<<endl;
 				currentTime[i] -= timeAddition(start, end, temp);
 			}
 			
-					cout<<currentTime[i]<<" remaining now"<<endl;
+					//cout<<currentTime[i]<<" remaining now"<<endl;
 		}
 
 	// for(int i=0; i<M; i++){ 
@@ -316,20 +331,26 @@ for(int r = 0; r < epan; r++)
 }
 
 	cout<<"----------_FINAL_-----------"<<endl;
-	for (int i=0; i<M; i++){
-		cout<<"\nDromologio No: "<<i+1<<endl;
-		finalDromologia[i].print();
-		cout<<"me xrono: "<<currentTime[i]<<endl;
-		cout<<"End of tour is: "<<hotel->getCloseTime(SD)<<endl;
-		SD++;
-			if (SD > 6){
-				SD = 0;
-			}
+	// for (int i=0; i<M; i++){
+	// 	cout<<"\nDromologio No: "<<i+1<<endl;
+	// 	finalDromologia[i].print();
+	// 	cout<<"me xrono: "<<currentTime[i]<<endl;
+	// 	cout<<"End of tour is: "<<hotel->getCloseTime(SD)<<endl;
+	// 	SD++;
+	// 		if (SD > 6){
+	// 			SD = 0;
+	// 		}
+	// }
+	tempResultsRead.open("tempresults.txt");
+	string getcontent;
+	while(getline(tempResultsRead,getcontent))
+	{
+		cout<<getcontent<<endl;
 	}
 	cout<<"Max score pou vrika: "<<maxScore<<endl;
 	cout<<"Score final: "<<calculateScore(M,finalDromologia)<<endl;
 
-	
+	remove("tempresults.txt");
 	//delete hotel;
 	return 0;
 
