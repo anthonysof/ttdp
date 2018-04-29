@@ -292,8 +292,8 @@ for(int r = 0; r < epan; r++)
 				SD = 0;
 			}
 	}
-	cout<<"\nScore: "<<maxScore<<endl;
-	cout<<"Score: "<<calculateScore(M,finalDromologia)<<endl;
+	cout<<"\nmaxScore: "<<maxScore<<endl;
+	cout<<"Final Dromologia Score: "<<calculateScore(M,finalDromologia)<<endl;
 
 	
 	delete hotel;
