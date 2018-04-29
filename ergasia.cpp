@@ -6,7 +6,7 @@
 #include "POI.h"
 
 //printing POIs
-ostream& operator<<(std::ostream& os, POI& p)
+ostream& operator<<(ostream& os, POI& p)
 {
 	os<<"Id: "<<p.getId()<<" Score: "<<p.getScore()<<endl;
 	return os;
@@ -78,12 +78,9 @@ int main(int argc, char* argv[]) {
 	int d, s, open, close;
 	int opena[7];
 	int closea[7];
-	string NWLN = "\n";
-	string garbagecan;
-
-	ofstream tempResultsWrite;
-	ifstream tempResultsRead;
+	string garbage;
 	
+	//Diavasma arxeiou, arxikopoihsh antikeimenwn POI kai eisagogi tous se pinaka megethous N
 	ifstream inFile(argv[3]);
 
 	inFile >> K >> M >> SD >> N;
@@ -93,6 +90,7 @@ int main(int argc, char* argv[]) {
 	POI pois[N];
 	List<POI> dromologia[M];
 	double currentTime[M]; 
+	//topothetisi hotel stin arxi kai telos ton dromologion
 	for(int i=0; i<M; i++){ 
 		dromologia[i].insertStart(*hotel);
 		dromologia[i].insertEnd(*hotel);
@@ -122,13 +120,13 @@ int main(int argc, char* argv[]) {
 	List<POI> finalDromologia[M];
 	
 	//----ALGORITHMOS----
-cout<<"Arxi tou tour "<<currentTime[0]<<endl;
+cout<<"Start of tour: "<<currentTime[0]<<endl;
 	
 for(int r = 0; r < epan; r++)
 {
 	for (int i=1; i < N; i++)
 	{
-		bool found = false;
+		bool found = false;			//yparxei to pois[i] se ena apo ta tria dromologia?
 		for(int m=0; m < M; m++)
 		{
 			if(dromologia[m].search(pois[i])!=-1)
@@ -138,7 +136,7 @@ for(int r = 0; r < epan; r++)
 				break;
 			}
 		}
-		if(found or pois[i].getOpenTime(SD) == pois[i].getCloseTime(SD))
+		if(found or pois[i].getOpenTime(SD) == pois[i].getCloseTime(SD)) //ean nai h an einai kleisto sinexise sto epomeno
 		{
 			continue;
 		}
@@ -156,12 +154,16 @@ for(int r = 0; r < epan; r++)
 					break;
 				}
 				POI start, end;
-				dromologia[m].findElem(j-1, start);
-				dromologia[m].findElem(j, end);
-				double currentTimeTemp = currentTime[m] + timeAddition(start, end, pois[i]);
-				if(currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD))
+				dromologia[m].findElem(j-1, start); //pairno to stoixio stin 8esi j-1 tis listas
+				dromologia[m].findElem(j, end); //to stoixio j
+				double currentTimeTemp = currentTime[m] + timeAddition(start, end, pois[i]); //ypologizo ton xrono pou 8a mou pros8esei
+				//elegxo arxika ean o xronos pou exw stin tin apostasi aytou pou
+				//tha prostheso einai mikroteros apo to kleisimo tou ksenodoxiou (end of tour)
+				if(currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD)) 
 				{
 					bool outOfTime = false;
+					//elegxos ean gia ta epomena aksio8eata tou dromologiou
+					//o xronos pou proste8ike den ftanei na ta episkeftoume
 					for(int y=j+1; y < list_sz; y++)
 					{
 						POI next;
@@ -174,9 +176,14 @@ for(int r = 0; r < epan; r++)
 					}
 					if (!outOfTime)
 					{
+						//an den exei ginei anefikti h episkepsi twn epomenwn
+						//vrisko to ofelos se ayti tin 8esi
+						//kai elegxo an einai megalitero apo to maxOf
 						double of = calculateOf(start, end, pois[i]);
 						if (maxOf <= of)
 						{
+							//an einai tote kratao tin thesi, to dromologio
+							//kai ton xrono pou tha exw meta tin prosthiki tou
 							maxOf = of;
 							savedJ = j;
 							savedM = m;
@@ -185,20 +192,30 @@ for(int r = 0; r < epan; r++)
 					}
 				}
 			}
+			//ayksano tin mera
 			SD++;
 			if (SD > 6)
 			{
+				//an einai meta apo 6 (kiriaki), ginetai 0 (deytera)
 				SD = 0;
 			}
 		}
+		//exontas elegksei tis 8eseis olwn twn dromologiwn giayto to aksiotheato
+		//elegxo oti sigoura exei allaksei to maxOf apo tin arxiki tou timi
 		if (maxOf > 0)
 		{
+			//kano enan teleytaio elegxo ean o xronos sto sigkekrimeno dromologio
+			//stin sigkekrimeni thesi meta tin prosthiki tou aksiotheatou pou eksetazo
+			//einai megaliteros h isws apo to kleisimo tou epomenou
 			POI temp;
 			dromologia[savedM].findElem(savedJ, temp);
 			if(savedTime >= temp.getCloseTime(SD))
 			{
+				//ean nai den tha ginei prosthiki 
 				continue;
 			}
+			//alliws prostheto to aksiotheato sto dromologio
+			//kai rithmizo analogws ton xrono tou
 			dromologia[savedM].insertPos(pois[i], savedJ);			
 			currentTime[savedM] = savedTime;
 			// cout<<"Inserted: "<<pois[i]<<" in: "<<savedM<<" at pos: "<<savedJ<<endl;
@@ -207,37 +224,32 @@ for(int r = 0; r < epan; r++)
 			//cout << currentTime[savedM] << endl;
 		}
 	}
+	//exontas eite gemisei ta dromologia, eite eksantlisei ta aksiotheata
+	//proxoraw sto na ypologiso to score twn dromologiwn
 	int totalScore = calculateScore(M,dromologia);
 	if (maxScore<totalScore)									
 	{
+		//ean einai megalitero tou maxScore to kratao
+		//kai kratao ta dromologia sta finalDromologia
 		maxScore = totalScore;
-		for (int i=0; i<M; i++)		//arxiki idea xrisimopoiontas copy cstor kai = operator tis listas
-		{							//distixws den doulevei opote akolouthei to workaround
+		for (int i=0; i<M; i++)		
+		{							
 			finalDromologia[i] = dromologia[i];
 		}  													
-		// tempResultsWrite.open("tempresults.txt", std::fstream::out);
-		// for (int i=0; i<M; i++)
-		// {
-		// tempResultsWrite<<"\nDromologio No: "<<i+1<<endl;
-		// dromologia[i].print(tempResultsWrite);
-		// tempResultsWrite<<"me xrono: "<<currentTime[i]<<endl;
-		// tempResultsWrite<<"End of tour is: "<<hotel->getCloseTime(SD)<<endl;
-		// SD++;
-		// 	if (SD > 6)
-		// 		SD = 0;
-			
-		// }
-		// tempResultsWrite.close();
 	}
 
 	//stin teleytaia epanalipsi den thelo tis diagrafes pou akolou8oun
 	if(r == epan-1)
 		break;
 	//diagrafes
+	//gia kathe dromologio
 	for(int i=0; i<M; i++)
 	{
+		//list_sz megethos dromologiou
 		int list_sz = dromologia[i].length();
+		//tixaio aksiotheato tou dromologiou
 		int randomIndex = rand() % (list_sz -2) + 1;
+		//posa tha diagrapso
 		int deletionCount = (list_sz-2) * pie;
 		int j = randomIndex;
 
@@ -245,6 +257,9 @@ for(int r = 0; r < epan; r++)
 			{
 				POI temp,start,end;
 				dromologia[i].findElem(randomIndex, temp);
+				//ean ftasei sto ksenodoxio
+				//sinexise na diagrafeis pera apo ayto
+				//diladi thesi 1 tis listas
 				if(temp == *hotel);
 				{
 					randomIndex = 1;
@@ -255,6 +270,8 @@ for(int r = 0; r < epan; r++)
 				
 				dromologia[i].deletePos(temp, randomIndex);
 				//cout<<"Deleted: "<<temp<<"From drom: "<<i<<endl;
+				//afairesi kai tis antistoixis prosthikis xronou 
+				//pou tha edine to diegrameno dromologio
 				currentTime[i] -= timeAddition(start, end, temp);
 			}
 			
@@ -262,28 +279,23 @@ for(int r = 0; r < epan; r++)
 	}
 }
 
+//-------FINAL RESULTS------
 	cout<<"----------FINAL-----------"<<endl;
 	for (int i=0; i<M; i++){
 		cout<<"\nDromologio No: "<<i+1<<endl;
 		finalDromologia[i].print();
-		cout<<"me xrono: "<<currentTime[i]<<endl;
-		cout<<"kai score: "<<calculateScore(finalDromologia[i])<<endl;
-		cout<<"End of tour is: "<<hotel->getCloseTime(SD)<<endl;
+		cout<<"End of tour: "<<currentTime[i]<<endl;
+		cout<<"Score: "<<calculateScore(finalDromologia[i])<<endl;
+		cout<<"Hotel closes at: "<<hotel->getCloseTime(SD)<<endl;
 		SD++;
 			if (SD > 6){
 				SD = 0;
 			}
 	}
-	// tempResultsRead.open("tempresults.txt");
-	// string getcontent;
-	// while(getline(tempResultsRead,getcontent))
-	// {
-	// 	cout<<getcontent<<endl;
-	// }
 	cout<<"\nScore: "<<maxScore<<endl;
 	cout<<"Score: "<<calculateScore(M,finalDromologia)<<endl;
 
-	remove("tempresults.txt");
+	
 	delete hotel;
 	return 0;
 
