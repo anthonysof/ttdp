@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
 	while(!inFile.eof())
 	{
 		inFile >> id >> x >> y >> d >> s;
-		inFile >> garbagecan;
+		inFile >> garbage;
 		for(int i = 0; i<7; i++){
 			inFile >> open;
 			opena[i] = open;
