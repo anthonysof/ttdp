@@ -11,6 +11,7 @@ class List
 {
 	public:
 		List();
+		List(const List & src); //copy cstor
 		~List();
 		void print();		//τυπώνει τα περιεχόμενα της λίστας
 		void print(ofstream&);
@@ -23,6 +24,7 @@ class List
 		int deletePos(T&, int pos);
 		int length();
 		bool findElem(int pos, T& elem);
+		List<T> & operator=(List<T> src);  //overload =
 	private:
 		ListNode<T> *head;
 		ListNode<T> *tail;
@@ -54,7 +56,7 @@ List<T>::~List()
 template <typename T>
 bool List<T>::isEmpty()
 {
-	if(head == NULL && tail == NULL)
+	if(head == NULL)
 		return 1;
 	else
 		return 0;
@@ -76,6 +78,7 @@ int List<T>::insertStart(const T& dataIn)
 		head = newNode;
 		return 1;
 	}
+	return 0;
 }
 
 template <typename T>
@@ -195,13 +198,13 @@ int List<T>::deletePos(T& deleted, int pos)
 	ListNode<T> *temp = head;
 	ListNode<T> *prev = head;
 	if(isEmpty() || pos > length() || pos < 0){
-		return -1;
+		return 0;
 	}
 	else{
 		if(pos == 0)
 		{
 			deleteStart(deleted);
-			return 0;
+			return 1;
 		}
 		else
 		{
@@ -250,6 +253,26 @@ bool List<T>::findElem(int pos, T& elem)
 	}
 	return false;
 }
+
+template<typename T>						//cpy cstor
+List<T>::List(const List & src):head(NULL)
+{
+	ListNode<T>* current = src.head;
+	while(current!=NULL)
+	{
+		insertEnd(current->data);
+		current = current->next;
+	}
+
+}
+
+template<typename T>
+List<T> & List<T>::operator=(List<T> src)
+{
+	swap(head, src.head);
+	return *this;
+}
+
 #endif
 
 

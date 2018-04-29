@@ -1,105 +1,18 @@
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <math.h>
 #include <cstdlib>
-#include <iterator>  //to remove
-#include <algorithm>	//to remove
 #include "List.h"
-#include <vector>
-using namespace std;
+#include "POI.h"
 
-class POI {
-private:
-	int id;
-	double x, y;
-	int d;
-	int s;
-	int open[7];
-	int close[7];
-	bool selected;
-
-public:
-	
-	 void POIinitilize(int vn,double xcoord,double ycoord,int dur,int score, int opent[], int closet[]){
-		this->id = vn;
-		this->x = xcoord;
-		this->y = ycoord;
-		this->d = dur;
-		this->s = score;
-		for (int i = 0; i < 7; i++){
-			this->open[i] = opent[i];
-			this->close[i] = closet[i];
-		}
-		selected = false;
-	}
-	double getCoordinates(char d){
-		if(d == 'x'){
-			return this->x;
-		}
-		else{
-			return this->y;
-		}
-	}
-	int getDuration() {
-		return this->d;
-	}
-	int getScore() {
-		return this->s;
-	}
-	int getOpenTime(int day){
-		for(int j=0;j<7;j++){
-			if(day==j){
-				return this->open[j];
-			}
-		}
-	}
-	int getCloseTime(int day){
-		for(int j=0;j<7;j++){
-			if(day==j){
-				return this->close[j];
-			}
-		}
-	}
-	int getId(){
-		return this->id;
-	}
-
-	void selectPoi(){
-		selected = true;
-	}
-	bool getSelected(){
-		return selected;
-	}
-
-	POI() { }
-	//hotel constructor
-	 POI(int vn,double xcoord,double ycoord, int opent, int closet){
-		id = vn;
-		x = xcoord;
-		y = ycoord;
-		for (int i = 0; i < 7; i++){
-			open[i] = opent;
-			close[i] = closet;
-		}
-	}
-	bool operator==(const POI& rhs) const
+//printing POIs
+ostream& operator<<(std::ostream& os, POI& p)
 {
-	return id == rhs.id;
-}
-	bool operator!=(const POI& rhs) const
-{
-	return id != rhs.id;
-}
-};
-
-
-std::ostream& operator<<(std::ostream& os, POI& p)
-{
-	os<<"Id: "<<p.getId()<<"\tScore: "<<p.getScore()<<endl;
+	os<<"Id: "<<p.getId()<<" Score: "<<p.getScore()<<endl;
 	return os;
 }
 
+//returns the distance between starting point and ending point
 double calculateDistance(POI start, POI end){
 	double distance;
 	double endx = end.getCoordinates('x');
@@ -110,6 +23,7 @@ double calculateDistance(POI start, POI end){
 	return sqrt(distance);
 }
 
+//returns the total score of all trips in array of trips
 int calculateScore(int M ,List<POI> d[])
 {
 	POI temp;
@@ -124,28 +38,38 @@ int calculateScore(int M ,List<POI> d[])
 	}
 	return score;
 }
+//returns the total score of a trip
+int calculateScore(List<POI> trip)
+{
+	POI temp;
+	int score = 0;
+	for(int i=0; i<trip.length(); i++)
+	{
+		trip.findElem(i,temp);
+		score += temp.getScore();
+	}
+	return score;
+}
 
-
-
+//returns Οφ ratio according to type
 double calculateOf(POI start, POI end, POI between){
 	double of = pow(between.getScore(),2)/(calculateDistance(start,between)+between.getDuration()+calculateDistance(between,end)-calculateDistance(start,end));
 	return of;
 }
 
+//returns time added to the trip if POI between was inserted in between of Start and End
 double timeAddition(POI start, POI end, POI between)
 {
 	return calculateDistance(start,between)+between.getDuration()+calculateDistance(between,end)-calculateDistance(start,end);
 	
 }
 
-bool validateTime(double currentTime, double endOfTour)		//to remove
-{
-	return (currentTime<endOfTour);
-}
 
 
-
+//---------MAIN----------
 int main(int argc, char* argv[]) {
+
+//-----METAVLITES KAI DIAVASMA APO TEST INSTANCE-----
 	int epan = atoi(argv[1]); //FIX ME
 	double pie = atof(argv[2]);
 	string filename = argv[3];
@@ -176,7 +100,8 @@ int main(int argc, char* argv[]) {
 	}
 	
 	int counter = 0;
-	while(!inFile.eof()){
+	while(!inFile.eof())
+	{
 		inFile >> id >> x >> y >> d >> s;
 		inFile >> garbagecan;
 		for(int i = 0; i<7; i++){
@@ -196,14 +121,18 @@ int main(int argc, char* argv[]) {
 	int maxScore = 0;
 	List<POI> finalDromologia[M];
 	
+	//----ALGORITHMOS----
 cout<<"Arxi tou tour "<<currentTime[0]<<endl;
 	
 for(int r = 0; r < epan; r++)
 {
-	for (int i=1; i < N; i++){
+	for (int i=1; i < N; i++)
+	{
 		bool found = false;
-		for(int m=0; m < M; m++){
-			if(dromologia[m].search(pois[i])!=-1){
+		for(int m=0; m < M; m++)
+		{
+			if(dromologia[m].search(pois[i])!=-1)
+			{
 				found = true;
 
 				break;
@@ -211,36 +140,43 @@ for(int r = 0; r < epan; r++)
 		}
 		if(found or pois[i].getOpenTime(SD) == pois[i].getCloseTime(SD))
 		{
-			//cout<<"GEIA SOU VREEEE"<<endl;
 			continue;
 		}
 		double maxOf = 0;
 		int savedM, savedJ;
 		double savedTime;
 		SD = SD_;
-		for(int m=0; m < M; m++){
+		for(int m=0; m < M; m++)
+		{
 			int list_sz = dromologia[m].length();
-			for (int j=1; j < list_sz; j++){
-				if(j+1 >= list_sz and j != 1){
+			for (int j=1; j < list_sz; j++)
+			{
+				if(j+1 >= list_sz and j != 1)
+				{
 					break;
 				}
 				POI start, end;
 				dromologia[m].findElem(j-1, start);
 				dromologia[m].findElem(j, end);
 				double currentTimeTemp = currentTime[m] + timeAddition(start, end, pois[i]);
-				if(currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD)){
+				if(currentTimeTemp + calculateDistance(end, *hotel) <= hotel->getCloseTime(SD))
+				{
 					bool outOfTime = false;
-					for(int y=j+1; y < list_sz; y++){
+					for(int y=j+1; y < list_sz; y++)
+					{
 						POI next;
 						dromologia[m].findElem(y, next);
-						if(currentTimeTemp > next.getCloseTime(SD)){
+						if(currentTimeTemp > next.getCloseTime(SD))
+						{
 							outOfTime = true;
 							break;
 						}
 					}
-					if (!outOfTime){
+					if (!outOfTime)
+					{
 						double of = calculateOf(start, end, pois[i]);
-						if (maxOf <= of){
+						if (maxOf <= of)
+						{
 							maxOf = of;
 							savedJ = j;
 							savedM = m;
@@ -250,16 +186,17 @@ for(int r = 0; r < epan; r++)
 				}
 			}
 			SD++;
-			if (SD > 6){
+			if (SD > 6)
+			{
 				SD = 0;
 			}
 		}
-		if (maxOf > 0){
+		if (maxOf > 0)
+		{
 			POI temp;
 			dromologia[savedM].findElem(savedJ, temp);
 			if(savedTime >= temp.getCloseTime(SD))
 			{
-				//cout<<"KAMPANAKI NTIN NTAN"<<endl;
 				continue;
 			}
 			dromologia[savedM].insertPos(pois[i], savedJ);			
@@ -273,41 +210,35 @@ for(int r = 0; r < epan; r++)
 	int totalScore = calculateScore(M,dromologia);
 	if (maxScore<totalScore)									
 	{
-		//cout<<"*********ASTERISK*****MPHKA***************"<<endl;
 		maxScore = totalScore;
-		//copy(dromologia, dromologia+M, finalDromologia);  COPY DE DOULEVEI? PAKISTAN TIME
-		tempResultsWrite.open("tempresults.txt", std::fstream::out);
-		for (int i=0; i<M; i++)
-		{
-		tempResultsWrite<<"\nDromologio No: "<<i+1<<endl;
-		dromologia[i].print(tempResultsWrite);
-		tempResultsWrite<<"me xrono: "<<currentTime[i]<<endl;
-		tempResultsWrite<<"End of tour is: "<<hotel->getCloseTime(SD)<<endl;
-		SD++;
-			if (SD > 6)
-				SD = 0;
+		for (int i=0; i<M; i++)		//arxiki idea xrisimopoiontas copy cstor kai = operator tis listas
+		{							//distixws den doulevei opote akolouthei to workaround
+			finalDromologia[i] = dromologia[i];
+		}  													
+		// tempResultsWrite.open("tempresults.txt", std::fstream::out);
+		// for (int i=0; i<M; i++)
+		// {
+		// tempResultsWrite<<"\nDromologio No: "<<i+1<<endl;
+		// dromologia[i].print(tempResultsWrite);
+		// tempResultsWrite<<"me xrono: "<<currentTime[i]<<endl;
+		// tempResultsWrite<<"End of tour is: "<<hotel->getCloseTime(SD)<<endl;
+		// SD++;
+		// 	if (SD > 6)
+		// 		SD = 0;
 			
-		}
-		tempResultsWrite.close();
+		// }
+		// tempResultsWrite.close();
 	}
-	// for (int i=0; i<M; i++){
-	// 	dromologia[i]->print();
-	// }
-	
-	//--INSERT RITUAL TO APPEASE THE MACHINE SPIRIT HERE--
-	// The soul of the Machine God surrounds thee.
-	// The power of the Machine God invests thee.
-	// The hate of the Machine God drives thee.
-	// The Machine God endows thee with life.
-	// COMPILE! (and dont print garbage)
+
+	//stin teleytaia epanalipsi den thelo tis diagrafes pou akolou8oun
 	if(r == epan-1)
 		break;
+	//diagrafes
 	for(int i=0; i<M; i++)
 	{
 		int list_sz = dromologia[i].length();
 		int randomIndex = rand() % (list_sz -2) + 1;
 		int deletionCount = (list_sz-2) * pie;
-//		int counter = 0;
 		int j = randomIndex;
 
 			for(int counter = 0; counter < deletionCount; counter++)
@@ -328,35 +259,32 @@ for(int r = 0; r < epan; r++)
 			}
 			
 					//cout<<currentTime[i]<<" remaining now"<<endl;
-		}
-
-	// for(int i=0; i<M; i++){ 
-	// 	currentTime[i] = hotel->getOpenTime(SD);
-	// }
+	}
 }
 
-	cout<<"----------_FINAL_-----------"<<endl;
-	// for (int i=0; i<M; i++){
-	// 	cout<<"\nDromologio No: "<<i+1<<endl;
-	// 	finalDromologia[i].print();
-	// 	cout<<"me xrono: "<<currentTime[i]<<endl;
-	// 	cout<<"End of tour is: "<<hotel->getCloseTime(SD)<<endl;
-	// 	SD++;
-	// 		if (SD > 6){
-	// 			SD = 0;
-	// 		}
-	// }
-	tempResultsRead.open("tempresults.txt");
-	string getcontent;
-	while(getline(tempResultsRead,getcontent))
-	{
-		cout<<getcontent<<endl;
+	cout<<"----------FINAL-----------"<<endl;
+	for (int i=0; i<M; i++){
+		cout<<"\nDromologio No: "<<i+1<<endl;
+		finalDromologia[i].print();
+		cout<<"me xrono: "<<currentTime[i]<<endl;
+		cout<<"kai score: "<<calculateScore(finalDromologia[i])<<endl;
+		cout<<"End of tour is: "<<hotel->getCloseTime(SD)<<endl;
+		SD++;
+			if (SD > 6){
+				SD = 0;
+			}
 	}
-	cout<<"Max score pou vrika: "<<maxScore<<endl;
-	cout<<"Score final: "<<calculateScore(M,finalDromologia)<<endl;
+	// tempResultsRead.open("tempresults.txt");
+	// string getcontent;
+	// while(getline(tempResultsRead,getcontent))
+	// {
+	// 	cout<<getcontent<<endl;
+	// }
+	cout<<"\nScore: "<<maxScore<<endl;
+	cout<<"Score: "<<calculateScore(M,finalDromologia)<<endl;
 
 	remove("tempresults.txt");
-	//delete hotel;
+	delete hotel;
 	return 0;
 
 
