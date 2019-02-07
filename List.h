@@ -152,7 +152,7 @@ void List<T>::print()
 		cout<<"The contents are:\n";
 		while(current!=NULL)
 		{
-			cout<<current->data<<"->";
+			cout<<"->"<<current->data;
 			current = current->next;
 		}
 		cout<<endl;

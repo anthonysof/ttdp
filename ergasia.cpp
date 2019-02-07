@@ -221,7 +221,7 @@ for(int r = 0; r < epan; r++)
 			// cout<<"Inserted: "<<pois[i]<<" in: "<<savedM<<" at pos: "<<savedJ<<endl;
 			// cout << "Last Closing time: " << pois[i].getCloseTime(SD)<<" of pos " << savedJ << " with ID: " << pois[i].getId() << endl;
 			// cout<<currentTime[savedM]<<endl;
-			//cout << currentTime[savedM] << endl;
+			// cout << currentTime[savedM] << endl;
 		}
 	}
 	//exontas eite gemisei ta dromologia, eite eksantlisei ta aksiotheata
